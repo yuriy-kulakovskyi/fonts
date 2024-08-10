@@ -1,0 +1,9 @@
+/* Webfont: StreamlineModerne-Normal */@font-face {
+    font-family: 'StreamlineModerne';
+    src: url('Streamline Moderne.woff2') format('woff2'), /* Modern Browsers */
+         url('Streamline Moderne.otf') format('opentype'); /* Safari, Android, iOS */
+             font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+

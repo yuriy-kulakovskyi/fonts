@@ -1,0 +1,4 @@
+Font Name: Galil
+Version: 2.00
+Publisher: Fontup.co.il
+EULA (License): https://fontup.co.il/eula/

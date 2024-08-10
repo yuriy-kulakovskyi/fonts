@@ -1,0 +1,9 @@
+/* Webfont: StreamlineModerne-Italic2 */@font-face {
+    font-family: 'StreamlineModerneItalic2';
+    src: url('Streamline Moderne Italic 2.woff2') format('woff2'), /* Modern Browsers */
+         url('Streamline Moderne Italic 2.otf') format('opentype'); /* Safari, Android, iOS */
+             font-style: italic;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+
