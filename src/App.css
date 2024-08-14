@@ -97,6 +97,7 @@
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  padding-top: 200px;
 }
 
 .export-page p {
@@ -177,4 +178,8 @@ button:hover {
   width: 100%;
   display: flex;
   justify-content: flex-end;
+}
+
+.upload {
+  padding-top: 200px!important;
 }
