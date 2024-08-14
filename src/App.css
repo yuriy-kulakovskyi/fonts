@@ -4,6 +4,21 @@
   font-family: sans-serif;
 }
 
+.nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: fixed;
+}
+
+.nav div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
 .input-wrapper {
   width: 100%;
   display: flex;
@@ -26,6 +41,7 @@
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  padding-top: 200px;
 }
 
 .font-group {
@@ -53,12 +69,15 @@
 }
 
 .font-wrapper p,
-.upload p,
-.image span {
+.upload p {
   margin: 0;
   font-size: 50px;
   color: #000;
   text-align: right;
+}
+
+.image span {
+  font-size: 100px;
 }
 
 .selected {
