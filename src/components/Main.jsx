@@ -47,6 +47,7 @@ const Main = ({ inputValue, fontStyles, selectedFonts, setSelectedFonts }) => {
     }
   };
 
+
   return (
     <main className="main">
       {Object.keys(groupedFonts).map((baseName, index) => (

@@ -6,24 +6,27 @@ import { set, ref as dbRef, onValue } from 'firebase/database';
 const FontUploader = ({
   inputValue
 }) => {
-  const [fontFile, setFontFile] = useState(null);
+  const [fontFiles, setFontFiles] = useState([]);
   const [fonts, setFonts] = useState([]);
 
   const handleUpload = async () => {
-    if (fontFile) {
-      const fontName = fontFile.name.split('.')[0];
-      const fontRef = ref(storage, `fonts/${fontFile.name}`);
-      
-      await uploadBytes(fontRef, fontFile);
-      const downloadURL = await getDownloadURL(fontRef);
-  
-      const newFontRef = dbRef(database, `fonts/${fontName}`);
-      await set(newFontRef, {
-        name: fontName,
-        url: downloadURL,
+    if (fontFiles.length > 0) {
+      const uploadPromises = fontFiles.map(async (file) => {
+        const fontName = file.name.split('.')[0];
+        const fontRef = ref(storage, `fonts/${file.name}`);
+        
+        await uploadBytes(fontRef, file);
+        const downloadURL = await getDownloadURL(fontRef);
+    
+        const newFontRef = dbRef(database, `fonts/${fontName}`);
+        await set(newFontRef, {
+          name: fontName,
+          url: downloadURL,
+        });
       });
-  
-      setFontFile(null);
+
+      await Promise.all(uploadPromises);
+      setFontFiles([]);
       fetchFonts();
     }
   };
@@ -54,10 +57,11 @@ const FontUploader = ({
       <input
         type="file"
         accept=".ttf,.otf,.woff,.woff2"
-        onChange={(e) => setFontFile(e.target.files[0])}
+        onChange={(e) => setFontFiles(Array.from(e.target.files))}
+        multiple
       />
       <button onClick={handleUpload} style={{ margin: '10px 0' }}>
-        Upload Font
+        Upload Fonts
       </button>
 
       <h2>Available Fonts</h2>
