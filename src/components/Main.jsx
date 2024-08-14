@@ -64,7 +64,7 @@ const Main = ({ inputValue, fontStyles, selectedFonts, setSelectedFonts }) => {
               {inputValue !== '' && (
                 <div>
                   <button
-                    onClick={() => handleCopyToClipboard(textRefs.current[fontIndex], "cursive")}
+                    onClick={() => handleCopyToClipboard(textRefs.current[fontIndex], fontName)}
                   >
                     Copy
                   </button>
