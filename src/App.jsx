@@ -1,63 +1,67 @@
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { database } from './firebaseConfig';
+import { ref as dbRef, onValue } from 'firebase/database';
+
 import './App.css';
+
 import Input from './components/Input';
 import Main from './components/Main';
 import ExportPage from './components/ExportPage';
+import FontUploader from './components/UploadPage';
 
 function App() {
   const [inputValue, setInputValue] = useState('');
   const [fontStyles, setFontStyles] = useState({});
   const [selectedFonts, setSelectedFonts] = useState([]);
+  const [fonts, setFonts] = useState([]);
 
-  function importAll(r) {
-    let fonts = {};
-    r.keys().forEach((item) => {
-      const folderName = item.replace('./', '').split('/')[0];
-      if (!fonts[folderName]) {
-        fonts[folderName] = [];
-      }
-      fonts[folderName].push({ path: item, url: r(item) });
+  const fetchFonts = () => {
+    const fontsRef = dbRef(database, 'fonts/');
+    onValue(fontsRef, (snapshot) => {
+      const fontsData = snapshot.val();
+      const fontsArray = fontsData ? Object.values(fontsData) : [];
+      setFonts(fontsArray);
     });
-    return fonts;
-  }
+  };
 
   useEffect(() => {
-    const fonts = importAll(require.context('../public/assets/fonts', true, /\.(ttf|otf|woff|woff2)$/));
+    fetchFonts();
+  }, []);
 
+  useEffect(() => {
     const dynamicStyles = {};
 
-    Object.keys(fonts).forEach((folderName) => {
-      dynamicStyles[folderName] = fonts[folderName].map((font) => {
-        const fontName = font.path.split('/').pop().split('.')[0];
+    fonts.forEach((font) => {
+      const fontName = font.name;
+      const fontUrl = font.url;
 
-        const fontStyle = `
-          @font-face {
-            font-family: '${fontName}';
-            src: url(${font.url}) format('truetype');
-          }
-        `;
-
-        return {
-          fontFamily: fontName,
-          style: fontStyle,
-        };
-      });
+      const fontStyle = `
+        @font-face {
+          font-family: '${fontName}';
+          src: url(${fontUrl}) format('truetype');
+        }
+      `;
+      dynamicStyles[fontName] = {
+        fontFamily: fontName,
+        style: fontStyle,
+      };
 
       const styleSheet = document.createElement('style');
       styleSheet.type = 'text/css';
-      styleSheet.innerText = dynamicStyles[folderName].map(f => f.style).join('\n');
+      styleSheet.innerText = fontStyle;
       document.head.appendChild(styleSheet);
     });
-
     setFontStyles(dynamicStyles);
-  }, []);
+  }, [fonts]);
+
 
   return (
     <Router>
       <nav className='nav'>
         <Link to="/">Home</Link>
         <Link to="/export">Export</Link>
+        <Link to="/upload">Upload</Link>
       </nav>
       <Routes>
         <Route
@@ -80,7 +84,19 @@ function App() {
         <Route
           path="/export"
           element={
-            <ExportPage inputValue={inputValue} selectedFonts={selectedFonts} setSelectedFonts={setSelectedFonts} />
+            <ExportPage 
+              inputValue={inputValue} 
+              selectedFonts={selectedFonts} 
+              setSelectedFonts={setSelectedFonts} 
+            />
+          }
+        />
+        <Route
+          path="/upload"
+          element={
+          <FontUploader
+            inputValue={inputValue}
+          />
           }
         />
       </Routes>

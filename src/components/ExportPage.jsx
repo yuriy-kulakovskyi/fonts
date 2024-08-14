@@ -27,23 +27,7 @@ const ExportPage = ({ inputValue, selectedFonts, setSelectedFonts }) => {
     }
   };
 
-  function copyStyledText(index) {
-    const container = document.getElementById('text' + index);
-    const range = document.createRange();
-    range.selectNode(container);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
 
-    try {
-      const successful = document.execCommand('copy');
-      const msg = successful ? 'successfully' : 'unsuccessfully';
-      console.log('Text copied ' + msg);
-    } catch (err) {
-      console.error('Oops, unable to copy', err);
-    }
-
-    window.getSelection().removeAllRanges();
-  }
   return (
     <div className="export-page">
       {selectedFonts.length !== 0 && <p
@@ -68,15 +52,6 @@ const ExportPage = ({ inputValue, selectedFonts, setSelectedFonts }) => {
               {inputValue || 'Enter your text'}
             </span>
           </div>
-
-
-          <button
-            onClick={() => {
-              copyStyledText(index);
-            }}
-          >
-            Copy
-          </button>
         </>
       ))}
 
