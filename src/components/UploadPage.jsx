@@ -3,6 +3,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage, database } from '../firebaseConfig'; 
 import { set, ref as dbRef, onValue } from 'firebase/database';
 
+
 const FontUploader = ({
   inputValue
 }) => {
