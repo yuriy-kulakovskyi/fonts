@@ -43,6 +43,9 @@ function App() {
         case 'ttf':
           format = 'truetype';
           break;
+        case "TTF":
+          format = 'truetype';
+          break;
         case 'otf':
           format = 'opentype';
           break;
