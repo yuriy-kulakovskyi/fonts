@@ -1,8 +1,28 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 
 const Main = ({ inputValue, fontStyles, selectedFonts, setSelectedFonts }) => {
+  const selectedLanguage = 'All';
+  const [unloadedFonts, setUnloadedFonts] = useState([]);
   const textRefs = useRef([]);
+
+  useEffect(() => {
+    const checkFonts = async () => {
+      const unloaded = [];
+      for (const fontName of Object.keys(fontStyles)) {
+        try {
+          const loaded = await document.fonts.load(`16px ${fontName}`);
+          if (!loaded.length) {
+            unloaded.push(fontName);
+          }
+        } catch (err) {
+          unloaded.push(fontName);
+        }
+      }
+      setUnloadedFonts(unloaded);
+    };
+    checkFonts();
+  }, [fontStyles]);
 
   const handleFontToggle = (font) => {
     setSelectedFonts((prevSelectedFonts) =>
@@ -13,14 +33,15 @@ const Main = ({ inputValue, fontStyles, selectedFonts, setSelectedFonts }) => {
   };
 
   const groupedFonts = Object.keys(fontStyles).reduce((acc, fontName) => {
-    const baseName = fontName.split(/(?=[A-Z])/)[0];
-    if (!acc[baseName]) {
-      acc[baseName] = [];
+    if (!unloadedFonts.includes(fontName)) { // Виключення незавантажених шрифтів
+      const baseName = fontName.split(/(?=[A-Z])/)[0];
+      if (!acc[baseName]) {
+        acc[baseName] = [];
+      }
+      acc[baseName].push(fontName);
     }
-    acc[baseName].push(fontName);
     return acc;
   }, {});
-
 
   const handleCopyToClipboard = async (ref, fontName) => {
     try {
@@ -47,16 +68,31 @@ const Main = ({ inputValue, fontStyles, selectedFonts, setSelectedFonts }) => {
     }
   };
 
+  const filterFontsByLanguage = (fonts) => {
+    if (selectedLanguage === 'All') return fonts;
+    return fonts.filter((font) => {
+      const match = font.match(new RegExp(`\\b${selectedLanguage}\\b`, 'i'));
+      return match && match[0].toLowerCase() === selectedLanguage.toLowerCase(); // Точна відповідність
+    });
+  };
+
+  const filteredGroupedFonts = Object.keys(groupedFonts).reduce((acc, baseName) => {
+    const filteredFonts = filterFontsByLanguage(groupedFonts[baseName]);
+    if (filteredFonts.length > 0) {
+      acc[baseName] = filteredFonts;
+    }
+    return acc;
+  }, {});
 
   return (
     <main className="main">
-      {Object.keys(groupedFonts).map((baseName, index) => (
+
+      {Object.keys(filteredGroupedFonts).map((baseName, index) => (
         <div className="font-group" key={index}>
           <h5>{baseName}</h5>
-          {groupedFonts[baseName].map((fontName, fontIndex) => (
+          {filteredGroupedFonts[baseName].map((fontName, fontIndex) => (
             <div
-              className={`font-wrapper ${selectedFonts.includes(fontName) ? 'selected' : ''
-                }`}
+              className={`font-wrapper ${selectedFonts.includes(fontName) ? 'selected' : ''}`}
               key={fontIndex}
               onClick={() => handleFontToggle(fontName)}
             >
@@ -86,6 +122,18 @@ const Main = ({ inputValue, fontStyles, selectedFonts, setSelectedFonts }) => {
           ))}
         </div>
       ))}
+
+      {unloadedFonts.length > 0 && (
+        <div className="font-group">
+          <h5>Unloaded Fonts</h5>
+          {unloadedFonts.map((fontName, index) => (
+            <div key={index} className="font-wrapper">
+              <h6>{fontName}</h6>
+              <p>This font could not be loaded.</p>
+            </div>
+          ))}
+        </div>
+      )}
     </main>
   );
 };
